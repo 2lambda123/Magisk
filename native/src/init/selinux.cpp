@@ -21,8 +21,8 @@ void MagiskInit::patch_sepolicy(const char *in, const char *out) {
             auto name = "/data/" PREINITMIRR "/"s + entry->d_name;
             auto rule = name + "/sepolicy.rule";
             if (xaccess(rule.data(), R_OK) == 0 &&
-                access((name + "/disable").data(), F_OK) != 0 &&
-                access((name + "/remove").data(), F_OK) != 0) {
+                    access((name + "/disable").data(), F_OK) != 0 &&
+                    access((name + "/remove").data(), F_OK) != 0) {
                 LOGD("Loading custom sepolicy patch: [%s]\n", rule.data());
                 sepol->load_rule_file(rule.data());
             }
@@ -97,8 +97,10 @@ bool MagiskInit::hijack_sepolicy() {
 
         // Preserve sysfs and procfs for hijacking
         mount_list.erase(std::remove_if(
-                mount_list.begin(), mount_list.end(),
-                [](const string &s) { return s == "/proc" || s == "/sys"; }), mount_list.end());
+                             mount_list.begin(), mount_list.end(),
+        [](const string &s) {
+            return s == "/proc" || s == "/sys";
+        }), mount_list.end());
 
         mkfifo(MOCK_COMPAT, 0444);
         xmount(MOCK_COMPAT, buf, nullptr, MS_BIND, nullptr);
@@ -113,8 +115,8 @@ bool MagiskInit::hijack_sepolicy() {
             auto name = "/data/" PREINITMIRR "/"s + entry->d_name;
             auto rule_file = name + "/sepolicy.rule";
             if (xaccess(rule_file.data(), R_OK) == 0 &&
-                access((name + "/disable").data(), F_OK) != 0 &&
-                access((name + "/remove").data(), F_OK) != 0) {
+                    access((name + "/disable").data(), F_OK) != 0 &&
+                    access((name + "/remove").data(), F_OK) != 0) {
                 LOGD("Load custom sepolicy patch: [%s]\n", rule_file.data());
                 full_read(rule_file.data(), rules);
                 rules += '\n';
