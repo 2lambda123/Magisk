@@ -5,6 +5,7 @@
 #include <embed.hpp>
 
 #include "init.hpp"
+#include "flags.h"
 
 using namespace std;
 
@@ -149,13 +150,20 @@ bool MagiskInit::hijack_sepolicy() {
     xumount2(SELINUX_LOAD, MNT_DETACH);
     xumount2(SELINUX_ENFORCE, MNT_DETACH);
 
+#if defined (SELINUX_PERMISSIVE) && defined (MAGISK_DEBUG)
+    int one = xopen("one", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    xwrite(one, "1", 1);
+    close(one);
+    xmount("one", SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
+#endif
     // Load and patch policy
-    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(MOCK_LOAD));
-    sepol->magisk_rules();
-    sepol->load_rules(rules);
+    if (auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(MOCK_LOAD)); sepol) {
+        sepol->magisk_rules();
+        sepol->load_rules(rules);
 
-    // Load patched policy into kernel
-    sepol->to_file(SELINUX_LOAD);
+        // Load patched policy into kernel
+        sepol->to_file(SELINUX_LOAD);
+    }
 
     // Write to the enforce node ONLY after sepolicy is loaded. We need to make sure
     // the actual init process is blocked until sepolicy is loaded, or else
@@ -163,8 +171,12 @@ bool MagiskInit::hijack_sepolicy() {
     // We (ab)use the fact that init reads the enforce node, and because
     // it has been replaced with our FIFO file, init will block until we
     // write something into the pipe, effectively hijacking its control flow.
-
+#if defined (SELINUX_PERMISSIVE) && defined (MAGISK_DEBUG)
+    string enforce = "1";
+#else
     string enforce = full_read(SELINUX_ENFORCE);
+#endif
+
     xwrite(fd, enforce.data(), enforce.length());
     close(fd);
 
