@@ -143,7 +143,7 @@ if [ -f config.orig ]; then
   # Read existing configs
   chmod 0644 config.orig
   SHA1=$(grep_prop SHA1 config.orig)
-  if ! $BOOTMODE; then
+  if ! "$BOOTMODE"; then
     # Do not inherit config if not in recovery
     PREINITDEVICE=$(grep_prop PREINITDEVICE config.orig)
   fi
@@ -160,12 +160,12 @@ ui_print "- Patching ramdisk"
 SKIP32="#"
 SKIP64="#"
 if [ -f magisk64 ]; then
-  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk64 --preinit-device)
+  "$BOOTMODE" && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk64 --preinit-device)
   ./magiskboot compress=xz magisk64 magisk64.xz
   unset SKIP64
 fi
 if [ -f magisk32 ]; then
-  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk32 --preinit-device)
+  "$BOOTMODE" && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk32 --preinit-device)
   ./magiskboot compress=xz magisk32 magisk32.xz
   unset SKIP32
 fi
@@ -200,12 +200,12 @@ rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 #################
 
 for dt in dtb kernel_dtb extra; do
-  if [ -f $dt ]; then
-    if ! ./magiskboot dtb $dt test; then
+  if [ -f "$dt" ]; then
+    if ! ./magiskboot dtb "$dt" test; then
       ui_print "! Boot image $dt was patched by old (unsupported) Magisk"
       abort "! Please try again with *unpatched* boot image"
     fi
-    if ./magiskboot dtb $dt patch; then
+    if ./magiskboot dtb "$dt" patch; then
       ui_print "- Patch fstab in boot image $dt"
     fi
   fi
@@ -226,14 +226,14 @@ if [ -f kernel ]; then
 
   # Force kernel to load rootfs for legacy SAR devices
   # skip_initramfs -> want_initramfs
-  $LEGACYSAR && ./magiskboot hexpatch kernel \
+  "$LEGACYSAR" && ./magiskboot hexpatch kernel \
   736B69705F696E697472616D667300 \
   77616E745F696E697472616D667300 \
   && PATCHEDKERNEL=true
 
   # If the kernel doesn't need to be patched at all,
   # keep raw kernel to avoid bootloops on some weird devices
-  $PATCHEDKERNEL || rm -f kernel
+  "$PATCHEDKERNEL" || rm -f kernel
 fi
 
 #################
@@ -244,7 +244,7 @@ ui_print "- Repacking boot image"
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
 
 # Sign chromeos boot
-$CHROMEOS && sign_chromeos
+"$CHROMEOS" && sign_chromeos
 
 # Restore the original boot partition path
 [ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"
