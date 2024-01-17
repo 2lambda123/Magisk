@@ -12,7 +12,7 @@ void FirstStageInit::prepare() {
     prepare_data();
 
     if (struct stat st{}; fstatat(-1, "/sdcard", &st, AT_SYMLINK_NOFOLLOW) != 0 &&
-        fstatat(-1, "/first_stage_ramdisk/sdcard", &st, AT_SYMLINK_NOFOLLOW) != 0) {
+            fstatat(-1, "/first_stage_ramdisk/sdcard", &st, AT_SYMLINK_NOFOLLOW) != 0) {
         if (config->force_normal_boot) {
             xmkdirs("/first_stage_ramdisk/storage/self", 0755);
             xsymlink("/system/system/bin/init", "/first_stage_ramdisk/storage/self/primary");
@@ -70,7 +70,7 @@ bool SecondStageInit::prepare() {
     argv[0] = (char *) INIT_PATH;
 
     // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-    struct statfs sfs{};
+    struct statfs sfs {};
     statfs("/", &sfs);
     if (sfs.f_type == RAMFS_MAGIC || sfs.f_type == TMPFS_MAGIC) {
         // We are still on rootfs, so make sure we will execute the init of the 2nd stage

@@ -19,15 +19,15 @@ template<char... cs> using chars = integer_sequence<char, cs...>;
 // If not quoted, parsing ends when we find char in [breaks] + [escapes]
 template<char... escapes, char... breaks>
 static string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
-        string_view str, size_t &pos, bool &quoted) {
+                                       string_view str, size_t &pos, bool &quoted) {
     string result;
     char match_array[] = {escapes..., breaks..., '"'};
     string_view match(match_array, std::size(match_array));
     for (size_t cur = pos;; ++cur) {
         cur = str.find_first_of(match, cur);
         if (cur == string_view::npos ||
-            ((str[cur] == breaks) || ...) ||
-            (!quoted && ((str[cur] == escapes) || ...))) {
+                ((str[cur] == breaks) || ...) ||
+                (!quoted && ((str[cur] == escapes) || ...))) {
             result.append(str.substr(pos, cur - pos));
             pos = cur;
             return result;
@@ -50,23 +50,23 @@ static kv_pairs parse_impl(chars<padding...>, string_view str) {
     bool quoted = false;
     for (size_t pos = 0u; pos < str.size(); pos = str.find_first_not_of(delim, pos)) {
         auto key = extract_quoted_str_until(
-                chars<padding..., delim>{}, chars<'='>{}, str, pos, quoted);
+                       chars<padding..., delim> {}, chars<'='> {}, str, pos, quoted);
         pos = str.find_first_not_of(skip, pos);
         if (pos == string_view::npos || str[pos] == delim) {
             kv.emplace_back(key, "");
             continue;
         }
-        auto value = extract_quoted_str_until(chars<delim>{}, chars<>{}, str, pos, quoted);
+        auto value = extract_quoted_str_until(chars<delim> {}, chars<> {}, str, pos, quoted);
         kv.emplace_back(key, value);
     }
     return kv;
 }
 
 static kv_pairs parse_cmdline(string_view str) {
-    return parse_impl<' '>(chars<>{}, str);
+    return parse_impl<' '>(chars<> {}, str);
 }
 static kv_pairs parse_bootconfig(string_view str) {
-    return parse_impl<'\n'>(chars<' '>{}, str);
+    return parse_impl<'\n'>(chars<' '> {}, str);
 }
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
