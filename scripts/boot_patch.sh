@@ -35,10 +35,10 @@ getdir() {
   case "$1" in
     */*)
       dir=${1%/*}
-      if [ -z $dir ]; then
+      if [ -z "$dir" ]; then
         echo "/"
       else
-        echo $dir
+        echo "$dir"
       fi
     ;;
     *) echo "." ;;
@@ -49,9 +49,9 @@ getdir() {
 # Initialization
 #################
 
-if [ -z $SOURCEDMODE ]; then
+if [ -z "$SOURCEDMODE" ]; then
   # Switch to the location of the script file
-  cd "$(getdir "${BASH_SOURCE:-$0}")"
+  cd "$(getdir "${BASH_SOURCE:-$0}")" || exit
   # Load utility functions
   . ./util_functions.sh
   # Check if 64-bit
@@ -69,11 +69,11 @@ if [ -c "$BOOTIMAGE" ]; then
 fi
 
 # Flags
-[ -z $KEEPVERITY ] && KEEPVERITY=false
-[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
-[ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
-[ -z $RECOVERYMODE ] && RECOVERYMODE=false
-[ -z $LEGACYSAR ] && LEGACYSAR=false
+[ -z "$KEEPVERITY" ] && KEEPVERITY=false
+[ -z "$KEEPFORCEENCRYPT" ] && KEEPFORCEENCRYPT=false
+[ -z "$PATCHVBMETAFLAG" ] && PATCHVBMETAFLAG=false
+[ -z "$RECOVERYMODE" ] && RECOVERYMODE=false
+[ -z "$LEGACYSAR" ] && LEGACYSAR=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
@@ -122,7 +122,7 @@ case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
-    cat $BOOTIMAGE > stock_boot.img
+    cat "$BOOTIMAGE" > stock_boot.img
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
   1 )  # Magisk patched
