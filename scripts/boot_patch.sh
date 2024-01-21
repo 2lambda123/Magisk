@@ -40,7 +40,7 @@ getdir() {
       else
         echo "$dir"
       fi
-    ;;
+      ;;
     *) echo "." ;;
   esac
 }
@@ -90,15 +90,15 @@ ui_print "- Unpacking boot image"
 ./magiskboot unpack "$BOOTIMAGE"
 
 case $? in
-  0 ) ;;
-  1 )
+  0) ;;
+  1)
     abort "! Unsupported/Unknown image format"
     ;;
-  2 )
+  2)
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  * )
+  *)
     abort "! Unable to unpack boot image"
     ;;
 esac
@@ -119,21 +119,21 @@ else
   SKIP_BACKUP="#"
 fi
 case $((STATUS & 3)) in
-  0 )  # Stock boot
+  0) # Stock boot
     ui_print "- Stock boot image detected"
     SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
-    cat "$BOOTIMAGE" > stock_boot.img
+    cat "$BOOTIMAGE" >stock_boot.img
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
-  1 )  # Magisk patched
+  1) # Magisk patched
     ui_print "- Magisk patched boot image detected"
     ./magiskboot cpio ramdisk.cpio \
-    "extract .backup/.magisk config.orig" \
-    "restore"
+      "extract .backup/.magisk config.orig" \
+      "restore"
     cp -af ramdisk.cpio ramdisk.cpio.orig
     rm -f stock_boot.img
     ;;
-  2 )  # Unsupported
+  2) # Unsupported
     ui_print "! Boot image patched by unsupported programs"
     abort "! Please restore back to stock boot image"
     ;;
@@ -177,27 +177,27 @@ if [ -f magisk32 ]; then
 fi
 ./magiskboot compress=xz stub.apk stub.xz
 
-echo "KEEPVERITY=$KEEPVERITY" > config
-echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
-echo "RECOVERYMODE=$RECOVERYMODE" >> config
+echo "KEEPVERITY=$KEEPVERITY" >config
+echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >>config
+echo "RECOVERYMODE=$RECOVERYMODE" >>config
 if [ -n "$PREINITDEVICE" ]; then
   ui_print "- Pre-init storage partition: $PREINITDEVICE"
-  echo "PREINITDEVICE=$PREINITDEVICE" >> config
+  echo "PREINITDEVICE=$PREINITDEVICE" >>config
 fi
-[ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
+[ -n "$SHA1" ] && echo "SHA1=$SHA1" >>config
 
 ./magiskboot cpio ramdisk.cpio \
-"add 0750 $INIT magiskinit" \
-"mkdir 0750 overlay.d" \
-"mkdir 0750 overlay.d/sbin" \
-"$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
-"$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
-"add 0644 overlay.d/sbin/stub.xz stub.xz" \
-"patch" \
-"$SKIP_BACKUP backup ramdisk.cpio.orig" \
-"mkdir 000 .backup" \
-"add 000 .backup/.magisk config" \
-|| abort "! Unable to patch ramdisk"
+  "add 0750 $INIT magiskinit" \
+  "mkdir 0750 overlay.d" \
+  "mkdir 0750 overlay.d/sbin" \
+  "$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
+  "$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
+  "add 0644 overlay.d/sbin/stub.xz stub.xz" \
+  "patch" \
+  "$SKIP_BACKUP backup ramdisk.cpio.orig" \
+  "mkdir 000 .backup" \
+  "add 000 .backup/.magisk config" ||
+  abort "! Unable to patch ramdisk"
 
 rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 
@@ -221,9 +221,9 @@ if [ -f kernel ]; then
   PATCHEDKERNEL=false
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
-  49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
-  A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054 \
-  && PATCHEDKERNEL=true
+    49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
+    A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054 &&
+    PATCHEDKERNEL=true
 
   # Remove Samsung defex
   # Before: [mov w2, #-221]   (-__NR_execve)
@@ -233,9 +233,9 @@ if [ -f kernel ]; then
   # Force kernel to load rootfs for legacy SAR devices
   # skip_initramfs -> want_initramfs
   "$LEGACYSAR" && ./magiskboot hexpatch kernel \
-  736B69705F696E697472616D667300 \
-  77616E745F696E697472616D667300 \
-  && PATCHEDKERNEL=true
+    736B69705F696E697472616D667300 \
+    77616E745F696E697472616D667300 &&
+    PATCHEDKERNEL=true
 
   # If the kernel doesn't need to be patched at all,
   # keep raw kernel to avoid bootloops on some weird devices
