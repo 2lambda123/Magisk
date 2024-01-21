@@ -59,7 +59,7 @@ if [ -z $SOURCEDMODE ]; then
 fi
 
 BOOTIMAGE="$1"
-[ -e "$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
+[ -e "./$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
 
 # Dump image for MTD/NAND character device boot partitions
 if [ -c "$BOOTIMAGE" ]; then
