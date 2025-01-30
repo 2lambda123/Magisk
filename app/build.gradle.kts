@@ -104,7 +104,7 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.8.5"
+    val vNav = "2.8.6"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
