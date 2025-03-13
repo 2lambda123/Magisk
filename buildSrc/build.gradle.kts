@@ -18,7 +18,7 @@ gradlePlugin {
 dependencies {
     implementation(embeddedKotlin("gradle-plugin"))
     implementation("com.android.tools.build:gradle:8.9.0")
-    implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.8.8")
+    implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.8.9")
     implementation("org.lsposed.lsparanoid:gradle-plugin:0.6.0")
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r")
 }
